@@ -1,0 +1,571 @@
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii (PLN/MWh)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rce_prices_today
+      name: Cena energii (dzis)
+      show:
+        in_header: true
+        in_chart: false
+      stroke_width: 0
+    - entity: sensor.rce_prices_today
+      attribute: value
+      name: Cena energii (dzis)
+      data_generator: |
+        return (entity.attributes.value || []).map(item => {
+          const dateStr = item.dtime.replace(" ", "T");
+          const timestamp = new Date(dateStr).getTime();
+          return [timestamp - 900000, Number(item.rce_pln)];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  now:
+    show: true
+    label: Teraz
+    color: red
+  apex_config:
+    chart:
+      parentHeightOffset: 0
+    grid:
+      padding:
+        top: 12
+    legend:
+      show: false
+
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii z VAT (PLN/MWh)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rce_prices_today_scaled
+      name: Cena energii z VAT (dzis)
+      show:
+        in_header: true
+        in_chart: false
+      stroke_width: 0
+    - entity: sensor.rce_prices_today_scaled
+      attribute: value
+      name: Cena energii z VAT (dzis)
+      data_generator: |
+        return (entity.attributes.value || []).map(item => {
+          const dateStr = item.dtime.replace(" ", "T");
+          const timestamp = new Date(dateStr).getTime();
+          return [timestamp - 900000, Number(item.rce_pln)];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  now:
+    show: true
+    label: Teraz
+    color: red
+  apex_config:
+    chart:
+      parentHeightOffset: 0
+    grid:
+      padding:
+        top: 12
+    legend:
+      show: false
+
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+    offset: +1d
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii jutro (PLN/MWh)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rce_prices_tomorrow
+      attribute: value
+      name: Cena energii jutro
+      data_generator: |
+        const h = new Date().getHours();
+        const prices = entity.attributes.value || [];
+        const item = prices.find(p => new Date(p.dtime.replace(' ', 'T')).getHours() === h);
+        return item ? [[new Date().getTime(), Number(item.rce_pln)]] : [];
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: true
+        in_chart: false
+        legend_value: false
+    - entity: sensor.rce_prices_tomorrow
+      attribute: value
+      name: Cena energii jutro
+      data_generator: |
+        return entity.attributes.value.map(item => {
+          return [new Date(item.dtime.replace(" ", "T")).getTime(), item.rce_pln];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  apex_config:
+    grid:
+      padding:
+        top: 20
+    chart:
+      parentHeightOffset: 0
+    legend:
+      show: false
+    annotations:
+      xaxis:
+        - x: |
+            EVAL:(() => {
+              const t = new Date();
+              t.setDate(t.getDate() + 1);
+              t.setMinutes(0, 0, 0);
+              return t.getTime();
+            })()
+          strokeDashArray: 5
+          borderColor: red
+          borderWidth: 2
+          label:
+            text: Teraz
+            borderColor: red
+            style:
+              color: white
+              background: red
+
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+    offset: +1d
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii jutro z VAT (PLN/MWh)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rce_prices_tomorrow_scaled
+      attribute: value
+      name: Cena energii jutro z VAT
+      data_generator: |
+        const h = new Date().getHours();
+        const prices = entity.attributes.value || [];
+        const item = prices.find(p => new Date(p.dtime.replace(' ', 'T')).getHours() === h);
+        return item ? [[new Date().getTime(), Number(item.rce_pln)]] : [];
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: true
+        in_chart: false
+        legend_value: false
+    - entity: sensor.rce_prices_tomorrow_scaled
+      attribute: value
+      name: Cena energii jutro z VAT
+      data_generator: |
+        return entity.attributes.value.map(item => {
+          return [new Date(item.dtime.replace(" ", "T")).getTime(), item.rce_pln];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  apex_config:
+    grid:
+      padding:
+        top: 20
+    chart:
+      parentHeightOffset: 0
+    legend:
+      show: false
+    annotations:
+      xaxis:
+        - x: |
+            EVAL:(() => {
+              const t = new Date();
+              t.setDate(t.getDate() + 1);
+              t.setMinutes(0, 0, 0);
+              return t.getTime();
+            })()
+          strokeDashArray: 5
+          borderColor: red
+          borderWidth: 2
+          label:
+            text: Teraz
+            borderColor: red
+            style:
+              color: white
+              background: red
+
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii RDN (dzis)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rdn_prices_today
+      name: Cena energii RDN (dzis)
+      show:
+        in_header: true
+        in_chart: false
+      stroke_width: 0
+    - entity: sensor.rdn_prices_today
+      attribute: value
+      name: Cena energii RDN (dzis)
+      data_generator: |
+        return (entity.attributes.value || []).map(item => {
+          return [new Date(item.dtime).getTime(), item.rdn_pln];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  now:
+    show: true
+    label: Teraz
+    color: red
+  apex_config:
+    chart:
+      parentHeightOffset: 0
+    grid:
+      padding:
+        top: 12
+    legend:
+      show: false
+
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii RDN scaled (dzis)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rdn_prices_today_scaled
+      name: Cena energii RDN scaled (dzis)
+      show:
+        in_header: true
+        in_chart: false
+      stroke_width: 0
+    - entity: sensor.rdn_prices_today_scaled
+      attribute: value
+      name: Cena energii RDN scaled (dzis)
+      data_generator: |
+        return (entity.attributes.value || []).map(item => {
+          return [new Date(item.dtime).getTime(), item.rdn_pln];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  now:
+    show: true
+    label: Teraz
+    color: red
+  apex_config:
+    chart:
+      parentHeightOffset: 0
+    grid:
+      padding:
+        top: 12
+    legend:
+      show: false
+
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+    offset: +1d
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii RDN jutro (PLN/MWh)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rdn_prices_tomorrow
+      attribute: value
+      name: Cena energii jutro
+      data_generator: |
+        const h = new Date().getHours();
+        const prices = entity.attributes.value || [];
+        const item = prices.find(p => new Date(p.dtime).getHours() === h);
+        return item ? [[new Date().getTime(), Number(item.rdn_pln)]] : [];
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: true
+        in_chart: false
+        legend_value: false
+    - entity: sensor.rdn_prices_tomorrow
+      attribute: value
+      name: Cena energii jutro
+      data_generator: |
+        return entity.attributes.value.map(item => {
+          return [new Date(item.dtime).getTime(), item.rdn_pln];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  apex_config:
+    grid:
+      padding:
+        top: 20
+    chart:
+      parentHeightOffset: 0
+    legend:
+      show: false
+    annotations:
+      xaxis:
+        - x: |
+            EVAL:(() => {
+              const t = new Date();
+              t.setDate(t.getDate() + 1);
+              t.setMinutes(0, 0, 0);
+              return t.getTime();
+            })()
+          strokeDashArray: 5
+          borderColor: red
+          borderWidth: 2
+          label:
+            text: Teraz
+            borderColor: red
+            style:
+              color: white
+              background: red
+
+- type: custom:apexcharts-card
+  graph_span: 24h
+  span:
+    start: day
+    offset: +1d
+  update_interval: 15min
+  experimental:
+    color_threshold: true
+  header:
+    show: true
+    title: Ceny energii RDN jutro scaled (PLN/MWh)
+    show_states: true
+    colorize_states: true
+  series:
+    - entity: sensor.rdn_prices_tomorrow_scaled
+      attribute: value
+      name: Cena energii jutro scaled
+      data_generator: |
+        const h = new Date().getHours();
+        const prices = entity.attributes.value || [];
+        const item = prices.find(p => new Date(p.dtime).getHours() === h);
+        return item ? [[new Date().getTime(), Number(item.rdn_pln)]] : [];
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: true
+        in_chart: false
+        legend_value: false
+    - entity: sensor.rdn_prices_tomorrow_scaled
+      attribute: value
+      name: Cena energii jutro scaled
+      data_generator: |
+        return entity.attributes.value.map(item => {
+          return [new Date(item.dtime).getTime(), item.rdn_pln];
+        });
+      type: line
+      curve: stepline
+      stroke_width: 4
+      extend_to: false
+      color_threshold:
+        - value: 0
+          color: red
+        - value: 300
+          color: orange
+        - value: 500
+          color: yellow
+        - value: 700
+          color: green
+      show:
+        in_header: false
+        in_chart: true
+        legend_value: false
+  apex_config:
+    grid:
+      padding:
+        top: 20
+    chart:
+      parentHeightOffset: 0
+    legend:
+      show: false
+    annotations:
+      xaxis:
+        - x: |
+            EVAL:(() => {
+              const t = new Date();
+              t.setDate(t.getDate() + 1);
+              t.setMinutes(0, 0, 0);
+              return t.getTime();
+            })()
+          strokeDashArray: 5
+          borderColor: red
+          borderWidth: 2
+          label:
+            text: Teraz
+            borderColor: red
+            style:
+              color: white
+              background: red
